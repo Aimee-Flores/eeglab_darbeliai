@@ -61,7 +61,7 @@ function varargout = pop_nuoseklus_apdorojimas(varargin)
 
 % Edit the above text to modify the response to help pop_nuoseklus_apdorojimas
 
-% Last Modified by GUIDE v2.5 07-Dec-2014 16:27:43
+% Last Modified by GUIDE v2.5 02-Oct-2015 13:36:13
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1369,9 +1369,21 @@ for i=1:Pasirinktu_failu_N;
                 try
                     EEG = eeg_checkset( EEG );
                     eeglab redraw;
-                    pop_eegplot( EEG, 1, 1, 1);
-                    EEG = eegh('pop_eegplot( EEG, 1, 1, 1);', EEG);
-
+                    switch get(handles.popupmenu13,'Value')
+                        case 1
+                            if EEG.trials > 1;
+                                pop_eegplot( EEG, 1, 1, 1);
+                                EEG = eegh('pop_eegplot( EEG, 1, 1, 1);', EEG);
+                            else
+                                pop_eeg_perziura(EEG, 'zymeti',1);
+                            end;
+                        case 2
+                            pop_eeg_perziura(EEG, 'zymeti',1);
+                        case 3
+                            pop_eegplot( EEG, 1, 1, 1);
+                            EEG = eegh('pop_eegplot( EEG, 1, 1, 1);', EEG);
+                    end;
+                    
                     %eegplot( EEG.data, 'srate', EEG.srate, 'title', 'Scroll channel activities -- eegplot()', ...
                     %  'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:});
 
@@ -1383,7 +1395,7 @@ for i=1:Pasirinktu_failu_N;
                     %eeglab redraw;
 
 
-                    if get(handles.checkbox_perziureti_ICA_demesio,'Value') == 0 ;
+                    if get(handles.checkbox_perziureti_demesio,'Value') == 0 ;
 
                         while ~isempty([...
                                 findobj('-regexp','name','Reject components by map.*')  ; ...
@@ -3169,11 +3181,13 @@ if and(get(handles.checkbox_perziureti, 'Value') == 1, ...
         strcmp(get(handles.checkbox_perziureti, 'Enable'),'on'));
     set(handles.checkbox_perziureti_,'Enable','on');
     set(handles.checkbox_perziureti_demesio,'Enable','off');
+    set(handles.popupmenu13,'Enable','on');
     %set(handles.checkbox_perziureti_demesio,'Enable','inactive');
     set(handles.edit_perziureti,'Enable','on');
 else
     set(handles.checkbox_perziureti_,'Enable','off');
     set(handles.checkbox_perziureti_demesio,'Enable','off');
+    set(handles.popupmenu13,'Enable','off');
     set(handles.edit_perziureti,'Enable','off');
 end;
 checkbox_perziureti__Callback(hObject, eventdata, handles);
@@ -6412,3 +6426,26 @@ isimintini(3).nariai={ 'popupmenu12' 'popupmenu3' 'text8' 'text9' 'text_apdoroti
     'edit_epoch_iv' };
 drb_parinktys(hObject, eventdata, handles, 'irasyti', mfilename, vardas, komentaras, isimintini);
 
+
+
+% --- Executes on selection change in popupmenu13.
+function popupmenu13_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu13 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu13 contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu13
+
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu13_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu13 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
